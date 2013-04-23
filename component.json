@@ -1,0 +1,13 @@
+{
+  "name": "pong",
+  "version": "0.0.0",
+  "main": "pong.js",
+  "dependencies" : {
+    "jquery" : "x"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
+}
