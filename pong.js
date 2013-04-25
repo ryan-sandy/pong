@@ -11,8 +11,8 @@ var Ball = function (opts) {
     'r' : 10,
     'x' : 0,
     'y' : 0,
-    'dx' : 1,
-    'dy' : 0
+    'dx' : 2,
+    'dy' : 2
   }, self = this;
   $.extend(this, defs, opts);
   this.draw = function (ctx) {
@@ -62,7 +62,10 @@ var Paddel = function (opts) {
 };
 
 $(document).ready(function () {
-  var ctx, w, h, $can, ball, p1, p2;
+  var ctx, w, h, $can, loop, ball, p1, p2, requestAnimationFrame;
+
+  requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  window.requestAnimationFrame = requestAnimationFrame;
 
   $can = $("#canvas");
   ctx = $can[0].getContext("2d");
@@ -74,7 +77,7 @@ $(document).ready(function () {
   p1 = new Paddel({'x' : 0, 'y' : h / 2 - 25, 'h' : h});
   p2 = new Paddel({'x' : w - 10, 'y' : h / 2 - 25, 'h' : h});
 
-  var loop = setInterval(function () {
+  loop = function (tS) {
     if (ball.x > w) {
       $("#winner").html("<p>Left Player Wins!</p>").show();
       clearInterval(loop);
@@ -85,29 +88,38 @@ $(document).ready(function () {
       $("#winner").html("<p>Right Player Wins!</p>").show();
       return;
     }
+    if (ball.y < 0) {
+      ball.dy = ball.dy * -1;
+    }
+    if (ball.y > h) {
+      ball.dy = ball.dy * -1;
+    }
     if (ball.x < p1.w &&
-      ball.y > p1.y &&
-      ball.y < p1.y + p1.l) {
+        ball.y > p1.y &&
+        ball.y < p1.y + p1.l) {
       ball.dx = ball.dx * -1;
     }
     if (ball.x > w - p2.w - ball.r &&
-      ball.y > p2.y &&
-      ball.y < p2.y + p2.l) {
+        ball.y > p2.y &&
+        ball.y < p2.y + p2.l) {
       ball.dx = ball.dx * -1;
     }
-    
+
     ctx.clearRect(0, 0, w, h);
     ball.move();
     ball.draw(ctx);
     p1.draw(ctx);
     p2.draw(ctx);
-  }, 10);
+    requestAnimationFrame(loop);
+  };
 
+
+  requestAnimationFrame(loop);
   //global key listend
   $(document).keyup(function (e) {
     switch (e.keyCode) {
     case 13:
-      clearInterval(loop);
+      requestAnimationFrame();
       break;
     case 87:
       p1.moveUp();
